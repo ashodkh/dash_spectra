@@ -16,6 +16,48 @@ lines_waves = [3728.5, 4342, 4862.7, 4960.3, 5008.2, 6549.9, 6564.6, 6585.3, 671
 def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, inds=None, spectra=None,\
                       spec_colors=None, spec_names=None, lines_to_zoom=None, line_ews_obs=None, obs_ivar=None, line_ews_fit=None, wavelength=None, zs=None,\
                       kao_lines=False, masking=False, mask_ind=0):
+    '''
+    Plotting function that uses Dash to plot galaxies in a 2d plane of properties and shows their spectra by hovering over the points.
+    
+    Input
+    -----
+    
+    x,y : 1-D array like
+          The coordinates of the data points to be plotted. Can be anything measured for every galaxy, e.g. x=Mass, y=SFR.
+
+    xlim: list or tuple (xmin,xmax)
+          set the x limits of the axis.
+
+    ylim: list or tuple (xmin,xmax)
+          set the y limits of the axis.
+
+    color_code: 1-D array like
+                Array values to color code the points in the 2D plane.
+
+    cmap: String. Default is 'viridis'
+          The color map used to color-code the x,y points with color_code values
+
+    inds: 1-D array like. Default is range(len(x)).
+          array that matches x,y values to spectra indices. That is, the x[0], y[0] galaxy will have the spectrum spectra[inds[0]].
+          Must be changed if x[0], y[0] does not correspond to spectra[0].
+
+    spectra: Python dictionary of 2D arrays (N_points, N_features).
+             Spectra to be plotted. Can input several spectra for each object. The dictionary key should be the label of each spectrum (to be used in the legend),
+             and the associated values should be 2D arrays (N_points, N_features) of spectra. By this I mean (number of galaxies, length of wavelength grid).
+
+    spec_colors: list
+                 Colors of the spectra. That is, if there are 2 spectra for each point, one possibility is spec_colors = ['blue', 'orange'] 
+
+    spec_names: 
+
+    Output
+    ------
+    
+    Returns a Dash app
+    
+    '''
+        
+    
     app = JupyterDash(__name__)
 
     fig = go.Figure()
