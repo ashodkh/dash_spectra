@@ -184,10 +184,14 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
 
         for l in range(len(list(zoom.keys()))):
             fig0 = create_spectrum(ind)
-            fig0.update.xaxes(title='wavelength', range=[list(zoom.values()[l][ind])-zoom_windows[l],list(zoom.values()[l][ind])+zoom_windows[l]])
+            fig0.update_xaxes(title='wavelength', range=[list(zoom.values())[l][ind]-zoom_windows[l],list(zoom.values())[l][ind]+zoom_windows[l]])
             fig0.update_layout(width=500, height=650)
-            fig0.add_vline(x=list(zoom.values())[ind,l])
+            fig0.add_vline(x=list(zoom.values())[l][ind])
             figs.append(fig0)
+
+            fig0.update_layout(title=list(zoom.keys())[l])
+            if zoom_extras is not None:
+                pass
 
         return figs
 
