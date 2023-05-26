@@ -22,8 +22,9 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
     Input
     -----
     
-    x,y : 1-D array like
-          The coordinates of the data points to be plotted. Can be anything measured for every galaxy, e.g. x=Mass, y=SFR.
+    x,y : Python dictionaries
+          The coordinates of the data points to be plotted. Can be anything measured for every galaxy, e.g. x=Mass, y=SFR. 
+          Dictionary labels are the axis titles.
 
     xlim: list or tuple (xmin,xmax)
           set the x limits of the axis.
@@ -31,8 +32,9 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
     ylim: list or tuple (xmin,xmax)
           set the y limits of the axis.
 
-    color_code: 1-D array like
+    color_code: Python dictionary
                 Array values to color code the points in the 2D plane.
+                The keys are the labels for the color-coding.
 
     cmap: String. Default is 'viridis'
           The color map used to color-code the x,y points with color_code values
@@ -41,14 +43,30 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
           array that matches x,y values to spectra indices. That is, the x[0], y[0] galaxy will have the spectrum spectra[inds[0]].
           Must be changed if x[0], y[0] does not correspond to spectra[0].
 
-    spectra: Python dictionary of 2D arrays (N_points, N_features).
-             Spectra to be plotted. Can input several spectra for each object. The dictionary key should be the label of each spectrum (to be used in the legend),
-             and the associated values should be 2D arrays (N_points, N_features) of spectra. By this I mean (number of galaxies, length of wavelength grid).
+    spectra: List of 2D arrays (N_points, N_features).
+             A Python list of Spectra to be plotted. Can input several spectra for each object: spectra[0] should be a 2D array (N_points, N_features) that contains the first spectrum for every object (N_points) as a function of wavelnegth (N_features).
+             So (N_points, N_features) = (number of galaxies, length of wavelength grid).
 
-    spec_colors: list
+    wavelengths: 1-D array like.
+                 The wavelength grid of the spectra.
+
+    spec_colors: list (should be same length as the list of spectra)
                  Colors of the spectra. That is, if there are 2 spectra for each point, one possibility is spec_colors = ['blue', 'orange'] 
 
-    spec_names: 
+    spec_names: list (should be same length as the list of spectra)
+                Names of the spectra. To be used as labels in Legend.
+
+    zoom: Python dictionary.
+          Locations in the spectrum to zoom in on. These will appear as separate subplots.
+          The keys of the dictionary are labels for the subplots, and the values correspond to wavelengths to zoom in on.
+
+    zoom_windows: Integer. Default=10
+                  The zoom plots will have a wavelength range of wavelength[zoom-zoom_windows, zoom+zoom_windows]
+
+    zoom_extras: Python dictionary.
+                 Extra values to add to zoom subplots. Can be shown in the legend or in the title.
+                 Dictionary keys are the labels for the values.
+
 
     Output
     ------
