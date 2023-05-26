@@ -171,15 +171,22 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
     def update_lines(hov_data):
         ind = hov_data['points'][0]['customdata']
         figs = []
-        for i,l in enumerate(lines_to_zoom):
+        # for i,l in enumerate(lines_to_zoom):
+        #     fig0 = create_spectrum(ind)
+        #     fig0.update_xaxes(title='wavelength', range=[lines_waves[l]*(1+zs[ind])-13,lines_waves[l]*(1+zs[ind])+13])
+        #     fig0.update_layout(width=500, height=650)
+        #     fig0.add_vline(x=lines_waves[l]*(1+zs[ind]))
+        #     if line_ews_obs is None:
+        #         fig0.update_layout(title=lines[l])# + f'={target_lines[l][ids[4]]:.2f}+-{line_ivars[l][ids[4]]:.2f}')
+        #     else:
+        #         fig0.update_layout(title=lines[l] + f' obs_EW={line_ews_obs[ind,l]:.2f} +- {1/np.sqrt(obs_ivar[ind,l]):.2f}' +'\n'+ f'fit_EW={line_ews_fit[ind,l]:.2f}')
+        #     figs.append(fig0)
+
+        for l in range(len(list(zoom.keys()))):
             fig0 = create_spectrum(ind)
-            fig0.update_xaxes(title='wavelength', range=[lines_waves[l]*(1+zs[ind])-13,lines_waves[l]*(1+zs[ind])+13])
+            fig0.update.xaxes(title='wavelength', range=[list(zoom.values()[l][ind])-zoom_windows[l],list(zoom.values()[l][ind])+zoom_windows[l]])
             fig0.update_layout(width=500, height=650)
-            fig0.add_vline(x=lines_waves[l]*(1+zs[ind]))
-            if line_ews_obs is None:
-                fig0.update_layout(title=lines[l])# + f'={target_lines[l][ids[4]]:.2f}+-{line_ivars[l][ids[4]]:.2f}')
-            else:
-                fig0.update_layout(title=lines[l] + f' obs_EW={line_ews_obs[ind,l]:.2f} +- {1/np.sqrt(obs_ivar[ind,l]):.2f}' +'\n'+ f'fit_EW={line_ews_fit[ind,l]:.2f}')
+            fig0.add_vline(x=list(zoom.values())[ind,l])
             figs.append(fig0)
 
         return figs
