@@ -15,7 +15,8 @@ lines_waves = [3728.5, 4342, 4862.7, 4960.3, 5008.2, 6549.9, 6564.6, 6585.3, 671
 
 def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, inds=None, spectra=None,\
                       spec_colors=None, spec_names=None, lines_to_zoom=None, line_ews_obs=None, obs_ivar=None, line_ews_fit=None, wavelength=None, zs=None,\
-                      kao_lines=False, masking=False, mask_ind=0):
+                      kao_lines=False, masking=False, mask_ind=0,\
+                      zoom=None, zoom_windows=None, zoom_extras=None, zoom_extras_pos=None):
     '''
     Plotting function that uses Dash to plot galaxies in a 2d plane of properties and shows their spectra by hovering over the points.
     
@@ -67,7 +68,16 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
                  Extra values to add to zoom subplots. Can be shown in the legend or in the title.
                  Dictionary keys are the labels for the values.
 
+    zoom_extras_pos: String. Default is 'legend'.
+                     Where to put zoom_extras in the subplots. Can be 'legend' or 'title'.
 
+    kao_lines: Boolean. Default is False.
+               Adds kao lines to the 2D diagram.
+
+    masking: Boolean. Default is False.
+             Masks emission lines if True.
+
+    
     Output
     ------
     
@@ -114,7 +124,7 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
         dcc.Graph(id='2d-scatter', figure=fig, hoverData={'points': [{'customdata': [0]}]}, style={'display': 'inline-block'}),
         dcc.Graph(id='spectrum', style={'display': 'inline-block'})
     ]),
-    html.Div(html.Div([dcc.Graph(id=lines[l], style={'display':'inline-block'}) for l in lines_to_zoom]))]
+    html.Div(html.Div([dcc.Graph(id=list(zoom.keys())[l], style={'display':'inline-block'}) for l in range(len(list(zoom.keys())))]))]
     )
 
     def create_spectrum(ind):
@@ -156,7 +166,7 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
         return create_spectrum(hov_data['points'][0]['customdata'])
         
     @app.callback(
-        [Output(lines[l], 'figure') for l in lines_to_zoom],
+        [Output(list(zoom.keys())[l], 'figure') for l in range(len(list(zoom.keys())))],
         Input('2d-scatter', 'hoverData'))
     def update_lines(hov_data):
         ind = hov_data['points'][0]['customdata']
