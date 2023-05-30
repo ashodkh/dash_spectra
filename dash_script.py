@@ -121,12 +121,19 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
         fig.add_trace(trace2)
         fig.add_trace(trace3)
 
-    app.layout = html.Div([html.Div([
-        dcc.Graph(id='2d-scatter', figure=fig, hoverData={'points': [{'customdata': [0]}]}, style={'display': 'inline-block'}),
-        dcc.Graph(id='spectrum', style={'display': 'inline-block'})
-    ]),
-    html.Div(html.Div([dcc.Graph(id=list(zoom.keys())[l], style={'display':'inline-block'}) for l in range(len(list(zoom.keys())))]))]
-    )
+    if zoom is not None:
+        app.layout = html.Div([html.Div([
+            dcc.Graph(id='2d-scatter', figure=fig, hoverData={'points': [{'customdata': [0]}]}, style={'display': 'inline-block'}),
+            dcc.Graph(id='spectrum', style={'display': 'inline-block'})
+        ]),
+        html.Div(html.Div([dcc.Graph(id=list(zoom.keys())[l], style={'display':'inline-block'}) for l in range(len(list(zoom.keys())))]))]
+        )
+    else:
+        app.layout = html.Div([html.Div([
+            dcc.Graph(id='2d-scatter', figure=fig, hoverData={'points': [{'customdata': [0]}]}, style={'display': 'inline-block'}),
+            dcc.Graph(id='spectrum', style={'display': 'inline-block'})
+        ])]
+        )
 
     def create_spectrum(ind):
         fig = go.Figure()
@@ -146,34 +153,35 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
     def update_spectrum(hov_data):
         return create_spectrum(hov_data['points'][0]['customdata'])
         
-    @app.callback(
-        [Output(list(zoom.keys())[l], 'figure') for l in range(len(list(zoom.keys())))],
-        Input('2d-scatter', 'hoverData'))
-    def update_lines(hov_data):
-        ind = hov_data['points'][0]['customdata']
-        figs = []
-        # for i,l in enumerate(lines_to_zoom):
-        #     fig0 = create_spectrum(ind)
-        #     fig0.update_xaxes(title='wavelength', range=[lines_waves[l]*(1+zs[ind])-13,lines_waves[l]*(1+zs[ind])+13])
-        #     fig0.update_layout(width=500, height=650)
-        #     fig0.add_vline(x=lines_waves[l]*(1+zs[ind]))
-        #     if line_ews_obs is None:
-        #         fig0.update_layout(title=lines[l])# + f'={target_lines[l][ids[4]]:.2f}+-{line_ivars[l][ids[4]]:.2f}')
-        #     else:
-        #         fig0.update_layout(title=lines[l] + f' obs_EW={line_ews_obs[ind,l]:.2f} +- {1/np.sqrt(obs_ivar[ind,l]):.2f}' +'\n'+ f'fit_EW={line_ews_fit[ind,l]:.2f}')
-        #     figs.append(fig0)
+    if zoom is not None:
+        @app.callback(
+            [Output(list(zoom.keys())[l], 'figure') for l in range(len(list(zoom.keys())))],
+            Input('2d-scatter', 'hoverData'))
+        def update_lines(hov_data):
+            ind = hov_data['points'][0]['customdata']
+            figs = []
+            # for i,l in enumerate(lines_to_zoom):
+            #     fig0 = create_spectrum(ind)
+            #     fig0.update_xaxes(title='wavelength', range=[lines_waves[l]*(1+zs[ind])-13,lines_waves[l]*(1+zs[ind])+13])
+            #     fig0.update_layout(width=500, height=650)
+            #     fig0.add_vline(x=lines_waves[l]*(1+zs[ind]))
+            #     if line_ews_obs is None:
+            #         fig0.update_layout(title=lines[l])# + f'={target_lines[l][ids[4]]:.2f}+-{line_ivars[l][ids[4]]:.2f}')
+            #     else:
+            #         fig0.update_layout(title=lines[l] + f' obs_EW={line_ews_obs[ind,l]:.2f} +- {1/np.sqrt(obs_ivar[ind,l]):.2f}' +'\n'+ f'fit_EW={line_ews_fit[ind,l]:.2f}')
+            #     figs.append(fig0)
 
-        for l in range(len(list(zoom.keys()))):
-            fig0 = create_spectrum(ind)
-            fig0.update_xaxes(title='wavelength', range=[list(zoom.values())[l][ind]-zoom_windows[l],list(zoom.values())[l][ind]+zoom_windows[l]])
-            fig0.update_layout(width=500, height=650)
-            fig0.add_vline(x=list(zoom.values())[l][ind])
-            figs.append(fig0)
+            for l in range(len(list(zoom.keys()))):
+                fig0 = create_spectrum(ind)
+                fig0.update_xaxes(title='wavelength', range=[list(zoom.values())[l][ind]-zoom_windows[l],list(zoom.values())[l][ind]+zoom_windows[l]])
+                fig0.update_layout(width=500, height=650)
+                fig0.add_vline(x=list(zoom.values())[l][ind])
+                figs.append(fig0)
 
-            fig0.update_layout(title=list(zoom.keys())[l])
-            if zoom_extras is not None:
-                pass
+                fig0.update_layout(title=list(zoom.keys())[l])
+                if zoom_extras is not None:
+                    pass
 
-        return figs
+            return figs
 
     return app
