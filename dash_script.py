@@ -52,7 +52,8 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
                  The wavelength grid of the spectra.
 
     spec_colors: list (should be same length as the list of spectra)
-                 Colors of the spectra. That is, if there are 2 spectra for each point, one possibility is spec_colors = ['blue', 'orange'] 
+                 Colors of the spectra. That is, if there are 2 spectra for each point, one possibility is spec_colors = ['blue', 'orange'].
+                 Can also be input in rgb format: 'rgba(0,0,0,0.5)' is black with alpha=0.5, 'rgba(256,0,0,1)' is red with alpha=1, etc.
 
     spec_names: list (should be same length as the list of spectra)
                 Names of the spectra. To be used as labels in Legend.
@@ -128,29 +129,9 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
     )
 
     def create_spectrum(ind):
-        if masking:
-            masked_spectrum = scipy.signal.medfilt(spectra[mask_ind][ind], kernel_size=11)
-            rest_waves = wavelength/(1+zs[ind])
-            for j in range(len(lines)-1):
-                if lines[j]=='OII_DOUBLET_EW':
-                    waves_to_mask = np.where((rest_waves>=lines_waves[j]-10)*(rest_waves<=lines_waves[j]+10))[0]
-                else:
-                    waves_to_mask = np.where((rest_waves>=lines_waves[j]-6)*(rest_waves<=lines_waves[j]+6))[0]
-                x0 = rest_waves[waves_to_mask[0]-1]
-                x1 = rest_waves[waves_to_mask[-1]+1]
-                y0 = masked_spectrum[waves_to_mask[0]-1]
-                y1 = masked_spectrum[waves_to_mask[-1]+1]
-                masked_spectrum[waves_to_mask] = np.interp(rest_waves[waves_to_mask], [x0,x1], [y0,y1])
-
-        else:
-            masked_spectrum = spectra[mask_ind][ind]
-
         fig = go.Figure()
         for i in range(len(spectra)):
-            if i==mask_ind:
-                trace = go.Scatter(x=wavelength, y=masked_spectrum, mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
-            else:
-                trace = go.Scatter(x=wavelength, y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
+            trace = go.Scatter(x=wavelength, y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
             fig.add_trace(trace)
 
         fig.update_xaxes(title='wavelength')
