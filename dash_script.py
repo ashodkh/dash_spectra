@@ -65,19 +65,13 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
     zoom_windows: Integer. Default=10
                   The zoom plots will have a wavelength range of wavelength[zoom-zoom_windows, zoom+zoom_windows]
 
-    zoom_extras: Python dictionary.
-                 Extra values to add to zoom subplots. Can be shown in the legend or in the title.
+    zoom_extras: List of Python dictionaries.
+                 The list should be the size of zoom locations. There should be one dictionary for each zoom subplot.
+                 The dictionaries contain extra values to add to zoom subplots. Can be shown in the legend or in the title.
                  Dictionary keys are the labels for the values.
-
-    zoom_extras_pos: String. Default is 'legend'.
-                     Where to put zoom_extras in the subplots. Can be 'legend' or 'title'.
 
     kao_lines: Boolean. Default is False.
                Adds kao lines to the 2D diagram.
-
-    masking: Boolean. Default is False.
-             Masks emission lines if True.
-
     
     Output
     ------
@@ -160,16 +154,6 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
         def update_lines(hov_data):
             ind = hov_data['points'][0]['customdata']
             figs = []
-            # for i,l in enumerate(lines_to_zoom):
-            #     fig0 = create_spectrum(ind)
-            #     fig0.update_xaxes(title='wavelength', range=[lines_waves[l]*(1+zs[ind])-13,lines_waves[l]*(1+zs[ind])+13])
-            #     fig0.update_layout(width=500, height=650)
-            #     fig0.add_vline(x=lines_waves[l]*(1+zs[ind]))
-            #     if line_ews_obs is None:
-            #         fig0.update_layout(title=lines[l])# + f'={target_lines[l][ids[4]]:.2f}+-{line_ivars[l][ids[4]]:.2f}')
-            #     else:
-            #         fig0.update_layout(title=lines[l] + f' obs_EW={line_ews_obs[ind,l]:.2f} +- {1/np.sqrt(obs_ivar[ind,l]):.2f}' +'\n'+ f'fit_EW={line_ews_fit[ind,l]:.2f}')
-            #     figs.append(fig0)
 
             for l in range(len(list(zoom.keys()))):
                 fig0 = create_spectrum(ind)
@@ -180,7 +164,10 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
 
                 fig0.update_layout(title=list(zoom.keys())[l])
                 if zoom_extras is not None:
-                    pass
+                    string = ''
+                    for j in range(len(list(zoom_extras[l].keys()))):
+                        string+= list(zoom_extras[l].keys())[j] + f' {list(zoom_extras[l].values())[j][ind]:.2f} <br>'
+                    fig0.update_layout(title=string)
 
             return figs
 
