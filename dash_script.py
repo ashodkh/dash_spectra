@@ -1,16 +1,13 @@
 import numpy as np
-import pylab as plt
-import scipy.signal
-from matplotlib.backends.backend_pdf import PdfPages
 from jupyter_dash import JupyterDash
-from dash import html, dcc, Input, Output
+from dash import html, dcc, Input, Output, Dash
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
 import plotly
 
 def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, spectra=None,\
-                      spec_colors=plotly.colors.DEFAULT_PLOTLY_COLORS, spec_names=['0'], wavelength=None, zs=None,\
+                      spec_colors=plotly.colors.DEFAULT_PLOTLY_COLORS, spec_names=['0'], wavelength=None,\
                       kao_lines=False, masking=False, mask_ind=0,\
                       zoom=None, zoom_windows=None, zoom_extras=None, zoom_extras_pos=None):
     '''
