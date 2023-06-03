@@ -7,14 +7,10 @@ from dash import html, dcc, Input, Output
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
+import plotly
 
-lines = ["O2_doub","HGAMMA_EW","HBETA_EW","OIII_4959_EW","OIII_5007_EW","NII_6548_EW"\
-         ,"HALPHA_EW","NII_6584_EW","SII_6716_EW","SII_6731_EW", 'test']
-lines_waves = [3728.5, 4342, 4862.7, 4960.3, 5008.2, 6549.9, 6564.6, 6585.3, 6718.3, 6732.7] 
-
-
-def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, inds=None, spectra=None,\
-                      spec_colors=None, spec_names=None, lines_to_zoom=None, line_ews_obs=None, obs_ivar=None, line_ews_fit=None, wavelength=None, zs=None,\
+def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, spectra=None,\
+                      spec_colors=plotly.colors.DEFAULT_PLOTLY_COLORS, spec_names=['0'], wavelength=None, zs=None,\
                       kao_lines=False, masking=False, mask_ind=0,\
                       zoom=None, zoom_windows=None, zoom_extras=None, zoom_extras_pos=None):
     '''
@@ -39,10 +35,6 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
 
     cmap: String. Default is 'viridis'
           The color map used to color-code the x,y points with color_code values
-
-    inds: 1-D array like. Default is range(len(x)).
-          array that matches x,y values to spectra indices. That is, the x[0], y[0] galaxy will have the spectrum spectra[inds[0]].
-          Must be changed if x[0], y[0] does not correspond to spectra[0].
 
     spectra: List of 2D arrays (N_points, N_features).
              A Python list of Spectra to be plotted. Can input several spectra for each object: spectra[0] should be a 2D array (N_points, N_features) that contains the first spectrum for every object (N_points) as a function of wavelnegth (N_features).
@@ -83,9 +75,11 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
     
     app = JupyterDash(__name__)
 
+    if color_code is None:
+        color_code = {'same for all': np.ones(len(list(x.values())))}
     fig = go.Figure()
     trace0 = go.Scatter(
-        x=list(x.values())[0], y=list(y.values())[0], customdata=np.stack((inds), axis=-1),
+        x=list(x.values())[0], y=list(y.values())[0],
         mode='markers',
         name='galaxies',
         marker=dict(
@@ -117,14 +111,14 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
 
     if zoom is not None:
         app.layout = html.Div([html.Div([
-            dcc.Graph(id='2d-scatter', figure=fig, hoverData={'points': [{'customdata': [0]}]}, style={'display': 'inline-block'}),
+            dcc.Graph(id='2d-scatter', figure=fig, style={'display': 'inline-block'}),
             dcc.Graph(id='spectrum', style={'display': 'inline-block'})
         ]),
         html.Div(html.Div([dcc.Graph(id=list(zoom.keys())[l], style={'display':'inline-block'}) for l in range(len(list(zoom.keys())))]))]
         )
     else:
         app.layout = html.Div([html.Div([
-            dcc.Graph(id='2d-scatter', figure=fig, hoverData={'points': [{'customdata': [0]}]}, style={'display': 'inline-block'}),
+            dcc.Graph(id='2d-scatter', figure=fig, style={'display': 'inline-block'}),
             dcc.Graph(id='spectrum', style={'display': 'inline-block'})
         ])]
         )
@@ -145,14 +139,15 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, ind
         Output('spectrum', 'figure'),
         Input('2d-scatter', 'hoverData'))
     def update_spectrum(hov_data):
-        return create_spectrum(hov_data['points'][0]['customdata'])
+        ind = hov_data['points'][0]['pointIndex']
+        return create_spectrum(ind)
         
     if zoom is not None:
         @app.callback(
             [Output(list(zoom.keys())[l], 'figure') for l in range(len(list(zoom.keys())))],
             Input('2d-scatter', 'hoverData'))
         def update_lines(hov_data):
-            ind = hov_data['points'][0]['customdata']
+            ind = hov_data['points'][0]['pointIndex']
             figs = []
 
             for l in range(len(list(zoom.keys()))):
