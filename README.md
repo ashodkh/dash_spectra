@@ -1,4 +1,7 @@
 # dash_spectra
+
+An example with SDSS data is hosted on https://dash-spectra.onrender.com/. It is quite slow online, so hosting it locally will be much faster.
+
 This is a Python module (dash_spectra.py) that contains a function to plot galaxies in 2D spaces (for example, mass and star formation rate) and shows the spectrum of each point that is hovered over in real-time. This is done using [Dash](https://dash.plotly.com/tutorial).
 
 Note this was built assuming the user is using Jupyter.
