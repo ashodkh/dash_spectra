@@ -7,7 +7,7 @@ import plotly
 
 def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap='Viridis', images=None,\
                       image_labels=None,\
-                      kao_lines=False, masking=False, mask_ind=0):
+                      kao_lines=False):
     '''
     Plotting function that uses Dash to plot galaxies in a 2d plane of properties and shows their spectra by hovering over the points.
     
@@ -31,31 +31,12 @@ def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap
     cmap: String. Default is 'viridis'
           The color map used to color-code the x,y points with color_code values
 
-    spectra: List of 2D arrays (N_points, N_features).
-             A Python list of Spectra to be plotted. Can input several spectra for each object: spectra[0] should be a 2D array (N_points, N_features) that contains the first spectrum for every object (N_points) as a function of wavelnegth (N_features).
-             So (N_points, N_features) = (number of galaxies, length of wavelength grid).
+    images: List of 3D arrays (N_pixe, N_pixel, N_points)
+            A list of Images to be plotted. Can input several images for each object: images[0] should be a 3D array (N_pixe, N_pixel, N_points).
 
-    wavelengths: 1-D array like.
-                 The wavelength grid of the spectra.
+    image_labels: List of strings
+                  A list that contains labels for images to be used for axis titles. The list should be the same size as images list.
 
-    spec_colors: list (should be same length as the list of spectra)
-                 Colors of the spectra. That is, if there are 2 spectra for each point, one possibility is spec_colors = ['blue', 'orange'].
-                 Can also be input in rgb format: 'rgba(0,0,0,0.5)' is black with alpha=0.5, 'rgba(256,0,0,1)' is red with alpha=1, etc.
-
-    spec_names: list (should be same length as the list of spectra)
-                Names of the spectra. To be used as labels in Legend.
-
-    zoom: Python dictionary.
-          Locations in the spectrum to zoom in on. These will appear as separate subplots.
-          The keys of the dictionary are labels for the subplots, and the values correspond to wavelengths to zoom in on.
-
-    zoom_windows: Integer. Default=10
-                  The zoom plots will have a wavelength range of wavelength[zoom-zoom_windows, zoom+zoom_windows]
-
-    zoom_extras: List of Python dictionaries.
-                 The list should be the size of zoom locations. There should be one dictionary for each zoom subplot.
-                 The dictionaries contain extra values to add to zoom subplots. Can be shown in the legend or in the title.
-                 Dictionary keys are the labels for the values.
 
     kao_lines: Boolean. Default is False.
                Adds kao lines to the 2D diagram.
@@ -88,6 +69,7 @@ def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap
 
     fig.add_trace(trace0)
 
+    fig.update_traces(marker_size=3)
     fig.update_xaxes(title=list(x.keys())[0], range=xlim)
     fig.update_yaxes(title=list(y.keys())[0], range=ylim)
     fig.update_layout(width=750, height=650)
@@ -105,7 +87,7 @@ def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap
             #trace = go.Scatter(x=wavelength, y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
             #trace = go.Image(z=images[i][:,:,ind])
             #fig.add_trace(trace)
-            fig0 = px.imshow(np.log10(images[i][:,:,ind]))
+            fig0 = px.imshow(images[i][:,:,ind],color_continuous_scale='viridis')
             fig0.update_layout(title=str(ind))
             figs.append(fig0)
 
