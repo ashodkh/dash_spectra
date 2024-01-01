@@ -7,7 +7,7 @@ import plotly
 
 def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap='Viridis', spectra=None,\
                       spec_colors=plotly.colors.DEFAULT_PLOTLY_COLORS, spec_names=['0'], wavelength=None,\
-                      kao_lines=False, masking=False, mask_ind=0,\
+                      kao_lines=False, masking=False, mask_ind=0, y_max=None,\
                       zoom=None, zoom_windows=None, zoom_extras=None, zoom_extras_pos=None):
     '''
     Plotting function that uses Dash to plot galaxies in a 2d plane of properties and shows their spectra by hovering over the points.
@@ -36,8 +36,8 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
              A Python list of Spectra to be plotted. Can input several spectra for each object: spectra[0] should be a 2D array (N_points, N_features) that contains the first spectrum for every object (N_points) as a function of wavelnegth (N_features).
              So (N_points, N_features) = (number of galaxies, length of wavelength grid).
 
-    wavelengths: 1-D array like.
-                 The wavelength grid of the spectra.
+    wavelengths: List of 1D arrays(N_features).
+                 The wavelength grid corresponding to the spectra.
 
     spec_colors: list (should be same length as the list of spectra)
                  Colors of the spectra. That is, if there are 2 spectra for each point, one possibility is spec_colors = ['blue', 'orange'].
@@ -60,6 +60,9 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
 
     kao_lines: Boolean. Default is False.
                Adds kao lines to the 2D diagram.
+
+    y_max: List of 1D arrays (N_points).
+           Maximum flux value for each spectrum. Used to set the y-axis range of the spectrum plot.
     
     Output
     ------
@@ -122,12 +125,14 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
     def create_spectrum(ind):
         fig = go.Figure()
         for i in range(len(spectra)):
-            trace = go.Scatter(x=wavelength, y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
+            trace = go.Scatter(x=wavelength[i], y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
             fig.add_trace(trace)
 
         fig.update_xaxes(title='wavelength')
         fig.update_yaxes(title='flux')
         fig.update_layout(width=2000, height=650)
+        if y_max is not None:
+            fig.update_layout(yaxis_range=[0, y_max[ind]])
 
         return fig
 
