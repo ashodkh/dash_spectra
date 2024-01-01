@@ -7,7 +7,7 @@ import plotly
 
 def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap='Viridis', spectra=None,\
                       spec_colors=plotly.colors.DEFAULT_PLOTLY_COLORS, spec_names=['0'], wavelength=None,\
-                      kao_lines=False, masking=False, mask_ind=0, y_max=None,\
+                      kao_lines=False, masking=False, mask_ind=0, y_max=None, y_min=None,\
                       zoom=None, zoom_windows=None, zoom_extras=None, zoom_extras_pos=None):
     '''
     Plotting function that uses Dash to plot galaxies in a 2d plane of properties and shows their spectra by hovering over the points.
@@ -64,6 +64,8 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
     y_max: List of 1D arrays (N_points).
            Maximum flux value for each spectrum. Used to set the y-axis range of the spectrum plot.
     
+    y_min: List of 1D arrays (N_points).
+           Minimum flux value for each spectrum. Used to set the y-axis range of the spectrum plot.
     Output
     ------
     
@@ -122,7 +124,7 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
         ])]
         )
 
-    def create_spectrum(ind):
+    def create_spectrum(ind, y_range=False):
         fig = go.Figure()
         for i in range(len(spectra)):
             trace = go.Scatter(x=wavelength[i], y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
@@ -131,8 +133,10 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
         fig.update_xaxes(title='wavelength')
         fig.update_yaxes(title='flux')
         fig.update_layout(width=2000, height=650)
-        if y_max is not None:
-            fig.update_layout(yaxis_range=[0, y_max[ind]])
+
+        if y_range:
+            if y_max is not None:
+                fig.update_layout(yaxis_range=[y_min[ind], y_max[ind]])
 
         return fig
 
@@ -141,7 +145,7 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
         Input('2d-scatter', 'hoverData'))
     def update_spectrum(hov_data):
         ind = hov_data['points'][0]['pointIndex']
-        return create_spectrum(ind)
+        return create_spectrum(ind, y_range=True)
         
     if zoom is not None:
         @app.callback(
