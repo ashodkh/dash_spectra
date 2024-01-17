@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly
 
-def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap='Viridis', images=None,\
+def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, size=10, cmap='Viridis', images=None,\
                       image_labels=None,\
                       kao_lines=False):
     '''
@@ -28,6 +28,9 @@ def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap
                 Array values to color code the points in the 2D plane.
                 The keys are the labels for the color-coding.
 
+    size: Integer. Default is 10.
+          Size of the points in the 2D diagram.
+          
     cmap: String. Default is 'viridis'
           The color map used to color-code the x,y points with color_code values
 
@@ -63,7 +66,8 @@ def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap
         colorscale=cmap,
         colorbar=dict(
         title=list(color_code.keys())[0], orientation='h'
-        )
+        ),
+        size=size
         )
     )
 
@@ -87,7 +91,7 @@ def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap
             #trace = go.Scatter(x=wavelength, y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
             #trace = go.Image(z=images[i][:,:,ind])
             #fig.add_trace(trace)
-            fig0 = px.imshow(images[i][:,:,ind],color_continuous_scale='viridis')
+            fig0 = px.imshow(images[i][ind,:,:],color_continuous_scale='viridis')
             fig0.update_layout(title=str(ind))
             figs.append(fig0)
 
