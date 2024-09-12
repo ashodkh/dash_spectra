@@ -1,11 +1,15 @@
 import numpy as np
-from jupyter_dash import JupyterDash
-from dash import html, dcc, Input, Output
+from dash import html, dcc, Input, Output, Dash
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly
+from copy import deepcopy
+from dash_bootstrap_templates import load_figure_template
+import dash_bootstrap_components as dbc
 
-def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap='Viridis', spectra=None,\
+load_figure_template(["darkly"])
+
+def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cmap='haline', spectra=None,\
                       spec_colors=plotly.colors.DEFAULT_PLOTLY_COLORS, spec_names=['0'], wavelength=None,\
                       kao_lines=False, masking=False, mask_ind=0, y_max=None, y_min=None,\
                       zoom=None, zoom_windows=None, zoom_extras=None, zoom_extras_pos=None):
@@ -73,8 +77,8 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
     
     '''
         
-    
-    app = JupyterDash(__name__)
+
+    app = Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
     if color_code is None:
         color_code = {'same for all': np.ones(len(list(x.values())))}
@@ -96,7 +100,8 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
 
     fig.update_xaxes(title=list(x.keys())[0], range=xlim)
     fig.update_yaxes(title=list(y.keys())[0], range=ylim)
-    fig.update_layout(width=750, height=650)
+    fig.update_layout(width=750, height=650, font=dict(size=30))
+    #fig.update_layout(title='UMAP projections of Continua')
 
     if kao_lines:
         x1 = np.arange(-2,0,0.1)
@@ -112,15 +117,15 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
 
     if zoom is not None:
         app.layout = html.Div([html.Div([
-            dcc.Graph(id='2d-scatter', figure=fig, style={'display': 'inline-block'}),
-            dcc.Graph(id='spectrum', style={'display': 'inline-block'})
+            dcc.Graph(id='2d-scatter', figure=fig, style={'display': 'inline-block'}, mathjax=True),
+            dcc.Graph(id='spectrum', style={'display': 'inline-block'}, mathjax=True)
         ]),
-        html.Div(html.Div([dcc.Graph(id=list(zoom.keys())[l], style={'display':'inline-block'}) for l in range(len(list(zoom.keys())))]))]
+        html.Div(html.Div([dcc.Graph(id=list(zoom.keys())[l], style={'display':'inline-block'}, mathjax=True) for l in range(len(list(zoom.keys())))]))]
         )
     else:
         app.layout = html.Div([html.Div([
-            dcc.Graph(id='2d-scatter', figure=fig, style={'display': 'inline-block'}),
-            dcc.Graph(id='spectrum', style={'display': 'inline-block'})
+            dcc.Graph(id='2d-scatter', figure=fig, style={'display': 'inline-block'}, mathjax=True),
+            dcc.Graph(id='spectrum', style={'display': 'inline-block'}, mathjax=True)
         ])]
         )
 
@@ -130,9 +135,10 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
             trace = go.Scatter(x=wavelength[i], y=spectra[i][ind], mode='lines', marker=dict(color=spec_colors[i]), name=spec_names[i])
             fig.add_trace(trace)
 
-        fig.update_xaxes(title='wavelength')
+        fig.update_xaxes(title='Rest-Frame Wavelength (A)')
         fig.update_yaxes(title='flux')
-        fig.update_layout(width=2000, height=650)
+        fig.update_layout(width=2000, height=650, font=dict(size=30))
+        fig.update_layout(title='Spectrum vs Wavelength', title_x=0.5)
 
         if y_range:
             if y_max is not None:
@@ -144,7 +150,10 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
         Output('spectrum', 'figure'),
         Input('2d-scatter', 'hoverData'))
     def update_spectrum(hov_data):
-        ind = hov_data['points'][0]['pointIndex']
+        if hov_data is None:
+            ind = 0
+        else:
+            ind = hov_data['points'][0]['pointIndex']
         return create_spectrum(ind, y_range=True)
         
     if zoom is not None:
@@ -152,22 +161,25 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None, cma
             [Output(list(zoom.keys())[l], 'figure') for l in range(len(list(zoom.keys())))],
             Input('2d-scatter', 'hoverData'))
         def update_lines(hov_data):
-            ind = hov_data['points'][0]['pointIndex']
+            if hov_data is None:
+                ind = 0
+            else:
+                ind = hov_data['points'][0]['pointIndex']
             figs = []
 
             for l in range(len(list(zoom.keys()))):
                 fig0 = create_spectrum(ind)
-                fig0.update_xaxes(title='wavelength', range=[list(zoom.values())[l][ind]-zoom_windows[l],list(zoom.values())[l][ind]+zoom_windows[l]])
-                fig0.update_layout(width=500, height=650)
+                fig0.update_xaxes(title='Wavelength (A)', range=[list(zoom.values())[l][ind]-zoom_windows[l],list(zoom.values())[l][ind]+zoom_windows[l]])
+                fig0.update_layout(width=687.5, height=650, font=dict(size=30), showlegend=False)
                 fig0.add_vline(x=list(zoom.values())[l][ind])
+                fig0.update_layout(title=list(zoom.keys())[l], title_x=0.5)
                 figs.append(fig0)
 
-                fig0.update_layout(title=list(zoom.keys())[l])
                 if zoom_extras is not None:
                     string = ''
                     for j in range(len(list(zoom_extras[l].keys()))):
                         string+= list(zoom_extras[l].keys())[j] + f' {list(zoom_extras[l].values())[j][ind]:.2f} <br>'
-                    fig0.update_layout(title=string)
+                    fig0.update_layout(title=string, title_x=0.5)
 
             return figs
 
