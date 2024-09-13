@@ -1,6 +1,6 @@
 # dash_spectra
 
-An example with SDSS data is hosted on https://dash-spectra.onrender.com/. It is quite slow online, so hosting it locally will be much faster.
+An example with DESI data is hosted on [https://dash-spectra.onrender.com/](https://dash-with-umap.onrender.com). It is quite slow online, so hosting it locally will be much faster.
 
 dash_script.py is a Python module that contains a function to plot galaxies in 2D spaces (for example, mass and star formation rate) and shows the spectrum of each point that is hovered over in real-time. This is done using [Dash](https://dash.plotly.com/tutorial).
 
