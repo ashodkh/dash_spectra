@@ -10,8 +10,6 @@ dash_script_images.py is a similar module but instead of showing spectra in real
 
 The tutorial folder contains a Jupyter Notebook that demonstrates how to use this module with SDSS data. The data was obtained using [astroML](https://www.astroml.org/).
 
-The output of the tutorial is hosted on https://dash-spectra.onrender.com/.
-
 # Installation
 dash_script.py is just a module that can be downloaded and placed in a directory. 
 
@@ -19,7 +17,8 @@ It has to be in a directory that can be recognized by Python. This can either be
 
 **Dependencies**
 - Python
-- [Dash, Jupyter Dash](https://dash.plotly.com/installation)
+- [Dash](https://dash.plotly.com/installation)
+- [Dash bootstrap templates] (https://pypi.org/project/dash-bootstrap-templates/)
 - [Plotly](https://plotly.com/python/getting-started/)
 - [Numpy](https://numpy.org/install/)
 
