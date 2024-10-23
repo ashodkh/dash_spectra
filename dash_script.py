@@ -122,13 +122,14 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None,
     fig.update_layout(width=750, height=650, font=dict(size=30))
 
     if additional_lines is not None:
-        for i, additonal_line in enumerate(additional_lines):
+        for i, additional_line in enumerate(additional_lines):
             trace1 = go.Scatter(
                 x=additional_line['x'],
                 y=additional_line['y'],
                 marker_color=additional_line['color'],
-                line_dash=solid if additional_line['line_dash'] is not None else additional_line['line_dash'],
-                name=additional_line['name']
+                line_dash='solid' if additional_line['line_dash'] is None else additional_line['line_dash'],
+                name=additional_line['name'],
+                line=dict(width=10 if additional_line['line_width'] is None else additional_line['line_width'])
             )
             fig.add_trace(trace1)
 
