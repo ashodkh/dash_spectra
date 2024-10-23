@@ -18,7 +18,7 @@ It has to be in a directory that can be recognized by Python. This can either be
 **Dependencies**
 - Python
 - [Dash](https://dash.plotly.com/installation)
-- [Dash bootstrap templates] (https://pypi.org/project/dash-bootstrap-templates/)
+- [Dash bootstrap templates](https://pypi.org/project/dash-bootstrap-templates/)
 - [Plotly](https://plotly.com/python/getting-started/)
 - [Numpy](https://numpy.org/install/)
 
