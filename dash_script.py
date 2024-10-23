@@ -10,7 +10,7 @@ load_figure_template(["darkly"])
 
 def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None,
                       cmap='Tealgrn_r', spectra=None, spec_colors=plotly.colors.DEFAULT_PLOTLY_COLORS,
-                      spec_names=['0'], wavelength=None, kao_lines=False,
+                      spec_names=['0'], wavelength=None, additional_lines=None,
                       masking=False, mask_ind=0, y_max=None, y_min=None,
                       zoom=None, zoom_windows=None, zoom_extras=None, zoom_extras_pos=None):
     '''
@@ -75,8 +75,13 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None,
                  Can be shown in the legend or in the title.
                  Dictionary keys are the labels for the values.
 
-    kao_lines: Boolean. Default is False.
-               Adds kao lines to the 2D diagram.
+    additional_lines: Python list of dictionaries. Default=None.
+                      Each object in the list is a dictionary with the keys.
+                      x: 1D array (x values for the line to be plotted)
+                      y: 1D array (y values for the line to be plotted)
+                      color: String (color of the line)
+                      line_dash: String (line style of the line)
+                      name: String (name of the line to be shown in the legend)
 
     y_max: List of 1D arrays (N_points).
            Maximum flux value for each spectrum. 
@@ -116,20 +121,16 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None,
     fig.update_yaxes(title=list(y.keys())[0], range=ylim)
     fig.update_layout(width=750, height=650, font=dict(size=30))
 
-    if kao_lines:
-        x1 = np.arange(-2, 0, 0.1)
-        x2 = np.arange(-2, 0.21, 0.1)
-
-        trace1 = go.Scatter(x=x1, y=0.61/(x1+0.08) + 1.1, marker_color='black',
-                            name='star forming sequence')
-        trace2 = go.Scatter(x=x1, y=0.61/(x1-0.05)+1.3, marker_color='magenta',
-                            name='ka03')
-        trace3 = go.Scatter(x=x2, y=0.61/(x2-0.47)+1.19, marker_color='magenta',
-                            line_dash='dash', name='ka01')
-
-        fig.add_trace(trace1)
-        fig.add_trace(trace2)
-        fig.add_trace(trace3)
+    if additional_lines is not None:
+        for i, additonal_line in enumerate(additional_lines):
+            trace1 = go.Scatter(
+                x=additional_line['x'],
+                y=additional_line['y'],
+                marker_color=additional_line['color'],
+                line_dash=solid if additional_line['line_dash'] is not None else additional_line['line_dash'],
+                name=additional_line['name']
+            )
+            fig.add_trace(trace1)
 
     if zoom is not None:
         app.layout = html.Div([

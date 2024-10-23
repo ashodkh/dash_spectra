@@ -99,6 +99,7 @@ def dash_plot_images(x=None, y=None, xlim=None, ylim=None, color_code=None,
         [Output(image_labels[l], 'figure') for l in range(len(images))],
         Input('2d-scatter', 'hoverData')
     )
+    
     def update_spectrum(hov_data):
         if hov_data is None:
             ind = 0
