@@ -96,6 +96,7 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None,
 
     if color_code is None:
         color_code = {'same for all': np.ones(len(list(x.values())))}
+
     fig = go.Figure()
     trace0 = go.Scatter(
         x=list(x.values())[0], y=list(y.values())[0],
@@ -109,7 +110,6 @@ def dash_plot_spectra(x=None, y=None, xlim=None, ylim=None, color_code=None,
             )
         )
     )
-
     fig.add_trace(trace0)
 
     fig.update_xaxes(title=list(x.keys())[0], range=xlim)
